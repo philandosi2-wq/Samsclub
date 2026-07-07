@@ -1,199 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Costco Rewards</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --blue: #0071CE; --blue-dark: #004f93;
-      --yellow: #FFC220; --yellow-dark: #e8ab00;
-      --bg: #F2F2F2; --white: #FFFFFF;
-      --text: #041E42; --muted: #5a6472;
-    }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      display: flex; justify-content: center; align-items: flex-start;
-      padding: 0;
-    }
-    .page {
-      max-width: 480px; width: 100%;
-      background: var(--bg);
-      min-height: 100vh;
-      padding-bottom: 30px;
-    }
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
-    /* Header */
-    .header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 20px 14px;
-      background: var(--bg);
-    }
-    .header-left { display: flex; align-items: center; gap: 10px; }
-    .header-left img { height: 38px; width: auto; display: block; }
-    .header-divider { width: 1px; height: 22px; background: #c9ccd1; }
-    .header-title { font-size: 16px; font-weight: 700; color: var(--text); }
-    .spots-badge {
-      background: var(--white); border-radius: 20px;
-      padding: 7px 14px; font-size: 13px; font-weight: 600;
-      color: var(--text); white-space: nowrap;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
+export const Route = createFileRoute("/")({
+  component: Index,
+  head: () => ({
+    meta: [
+      { title: "Rewards Program - Claim Your Gift Card" },
+      {
+        name: "description",
+        content:
+          "Share your feedback and receive a gift card as our way of saying thanks. Join thousands who've already claimed.",
+      },
+      { property: "og:title", content: "Rewards Program - Claim Your Gift Card" },
+      {
+        property: "og:description",
+        content:
+          "Share your feedback and receive a gift card as our way of saying thanks.",
+      },
+    ],
+  }),
+});
 
-    /* Hero */
-    .hero { text-align: center; padding: 18px 24px 6px; }
-    .hero-eyebrow {
-      font-size: 12px; font-weight: 700; letter-spacing: 3px;
-      color: var(--muted); margin-bottom: 6px;
-    }
-    .hero-amount {
-      font-size: 44px; font-weight: 800; line-height: 1.15;
-      color: var(--text);
-    }
-    .hero-amount span { color: var(--blue); }
-    .hero-desc {
-      font-size: 15px; color: var(--muted); margin-top: 12px;
-      line-height: 1.5; padding: 0 8px;
-    }
+const steps = [
+  { n: 1, text: 'Click "Claim Now"' },
+  { n: 2, text: "Enter your email and basic info" },
+  { n: 3, text: "Complete 4-5 deals" },
+  { n: 4, text: "Enjoy your reward" },
+];
 
-    /* How to claim */
-    .section-label {
-      text-align: center; font-size: 12px; font-weight: 700;
-      letter-spacing: 3px; color: var(--muted);
-      margin: 24px 0 12px;
-    }
-    .steps-card {
-      background: var(--white); border-radius: 18px;
-      margin: 0 20px; overflow: hidden;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-    .step {
-      display: flex; align-items: center; gap: 16px;
-      padding: 18px 18px;
-      border-bottom: 1px solid #eef0f2;
-    }
-    .step:last-child { border-bottom: none; }
-    .step-num {
-      width: 30px; height: 30px; border-radius: 50%;
-      background: var(--blue); color: var(--white);
-      font-weight: 700; font-size: 14px;
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .step-text { font-size: 16px; font-weight: 600; color: var(--text); }
+const faqs = [
+  {
+    q: "How long do the deals take?",
+    a: "Most deals take just a few minutes each. The entire process can typically be completed within 30-60 minutes.",
+  },
+  {
+    q: "What are deals?",
+    a: "Deals are offers from our partners — free trials, sign-ups, or product samples. Completing them qualifies you for your reward.",
+  },
+  {
+    q: "How many deals do I have to do?",
+    a: "You'll need to complete 4-5 deals to qualify for your reward.",
+  },
+  {
+    q: "When will I receive my reward?",
+    a: "Rewards are typically delivered to your email within 24-48 hours after completing all required deals.",
+  },
+];
 
-    /* CTA */
-    .cta-wrap { padding: 22px 20px 6px; text-align: center; }
-    .cta-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; padding: 18px;
-      background: var(--yellow); color: var(--text);
-      border: none; border-radius: 16px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 18px; font-weight: 800;
-      cursor: pointer; text-decoration: none;
-      box-shadow: 0 4px 14px rgba(255,194,32,0.45);
-      transition: background 0.2s, transform 0.15s;
-    }
-    .cta-btn:hover { background: var(--yellow-dark); transform: translateY(-1px); }
-    .cta-btn:active { transform: translateY(0); }
-    .cta-sub { font-size: 13px; color: var(--muted); margin-top: 10px; }
-
-    /* FAQ */
-    .faq-wrap { padding: 18px 20px 0; display: flex; flex-direction: column; gap: 12px; }
-    .faq-item {
-      background: var(--white); border-radius: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      overflow: hidden;
-    }
-    .faq-q {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 18px 18px; cursor: pointer;
-      font-size: 15px; font-weight: 700; color: var(--text);
-    }
-    .faq-q svg { transition: transform 0.25s; flex-shrink: 0; }
-    .faq-item.open .faq-q svg { transform: rotate(180deg); }
-    .faq-a {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.3s ease;
-      font-size: 14px; color: var(--muted); line-height: 1.6;
-    }
-    .faq-a-inner { padding: 0 18px 18px; }
-    .faq-item.open .faq-a { max-height: 200px; }
-  </style>
-</head>
-<body>
-<div class="page">
-
-  <!-- Header -->
-  <div class="header">
-    <div class="header-left"><img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Costco_Wholesale_logo_2010-10-26.svg" alt="Costco">
-      <div class="header-divider"></div>
-      <div class="header-title">Costco Rewards</div>
-    </div>
-    <div class="spots-badge">Limited spots</div>
-  </div>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-eyebrow">UP TO</div>
-    <div class="hero-amount"><span>$750</span> Exclusive Member Reward</div>
-    <div class="hero-desc">Complete a quick registration to unlock your Costco shopping credit.</div>
-  </div>
-
-  <!-- How to claim -->
-  <div class="section-label">HOW TO CLAIM</div>
-  <div class="steps-card">
-    <div class="step"><div class="step-num">1</div><div class="step-text">Click the button below</div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-text">Enter your basic info</div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-text">Complete 4–5 deals</div></div>
-    <div class="step"><div class="step-num">4</div><div class="step-text">Claim your Costco shopping credit</div></div>
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-wrap">
-    <a class="cta-btn" href="https://linkthem.net/aff_c?offer_id=1323&aff_id=170353" target="_blank">Claim Your Reward</a>
-    <div class="cta-sub">Takes only a few minutes</div>
-  </div>
-
-  <!-- FAQ -->
-  <div class="faq-wrap">
-    <div class="faq-item" data-faq>
-      <div class="faq-q">
-        <span>How long does it take?</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#041E42" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+function Index() {
+  return (
+    <div className="min-h-screen bg-[#111] text-white">
+      <div className="bg-[#0033cc] py-3 text-center text-sm font-medium">
+        5,000+ People Already Claimed
       </div>
-      <div class="faq-a"><div class="faq-a-inner">Most members complete the process in under 10 minutes from start to finish.</div></div>
-    </div>
-    <div class="faq-item" data-faq>
-      <div class="faq-q">
-        <span>How many deals do I have to do?</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#041E42" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-      </div>
-      <div class="faq-a"><div class="faq-a-inner">You'll need to complete 4–5 partner offers to unlock your full reward.</div></div>
-    </div>
-    <div class="faq-item" data-faq>
-      <div class="faq-q">
-        <span>When will I receive my reward?</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#041E42" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-      </div>
-      <div class="faq-a"><div class="faq-a-inner">Rewards are typically issued shortly after all steps and offers are confirmed complete.</div></div>
-    </div>
-  </div>
 
-</div>
+      <main className="mx-auto max-w-2xl px-4 py-8">
+        <div className="mx-auto mb-8 flex aspect-square w-full max-w-sm items-center justify-center rounded-md bg-neutral-300">
+          <div className="text-center">
+            <div className="text-6xl font-black tracking-tight text-[#0033cc]">
+              REWARDS
+            </div>
+            <div className="mt-2 text-sm font-bold tracking-widest text-[#0033cc]">
+              CLAIM YOURS TODAY
+            </div>
+          </div>
+        </div>
 
-<script>
-  document.querySelectorAll('[data-faq]').forEach(item => {
-    item.querySelector('.faq-q').addEventListener('click', () => {
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('[data-faq]').forEach(i => i.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    });
-  });
-</script>
-</body>
-</html>
+        <h1 className="text-center text-4xl font-bold">Rewards Program</h1>
+        <p className="mx-auto mt-4 max-w-lg text-center text-neutral-400">
+          Your opinions matter. Help us improve the shopping experience and
+          receive a gift card as our way of saying thanks.
+        </p>
+
+        <ul className="mt-8 space-y-3">
+          {steps.map((s) => (
+            <li
+              key={s.n}
+              className="flex items-center gap-4 rounded-xl border border-neutral-800 bg-transparent p-4"
+            >
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#0033cc] text-lg font-semibold">
+                {s.n}
+              </div>
+              <span className="text-lg">{s.text}</span>
+            </li>
+          ))}
+        </ul>
+
+        <a
+          href="https://linkthem.net/aff_c?offer_id=2786&aff_id=170353"
+          className="mt-8 block w-full rounded-md bg-[#0033cc] py-4 text-center text-lg font-bold tracking-wide transition hover:bg-[#0029a3]"
+        >
+          CLAIM NOW
+        </a>
+        <p className="mt-3 text-center text-sm text-neutral-400">
+          Completion of deals is required to claim your reward.
+        </p>
+
+        <hr className="my-10 border-neutral-800" />
+
+        <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
+        <div className="mt-6 space-y-3">
+          {faqs.map((f, i) => (
+            <FaqItem key={i} q={f.q} a={f.a} />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-xl border border-neutral-800">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between p-4 text-left"
+      >
+        <span className="font-medium">{q}</span>
+        <ChevronDown
+          className={`h-5 w-5 shrink-0 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && <p className="px-4 pb-4 text-sm text-neutral-400">{a}</p>}
+    </div>
+  );
+}
